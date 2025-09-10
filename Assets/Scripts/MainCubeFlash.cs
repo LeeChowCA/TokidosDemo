@@ -5,22 +5,23 @@ public class MainCubeFlash : MonoBehaviour
     // use SerializeField to expose private variables in the inspector
     [SerializeField] float flashDuration = 0.2f;
     [SerializeField] float rotateSpeed = 10f; //degrees per second
-    private Renderer cubeRenderer;
-    private Color originalColor;
+    [SerializeField] SubCubeFlash[] subCubeFlashes;
+    [SerializeField] int flashingTime = 12; // total time to flash sub-cubes
+
+    private Renderer mainCubeRenderer;
+    private Color mainCubeOriginalColor;
 
     private bool startToRotate = false;
-
-    [SerializeField] SubCubeFlash[] subCubeFlashes;
+    
     private Color[] subCubeOriginalColors;
 
-    private bool isFlashing = false;
+    public bool IsFlashing { get; private set; } // use isFlashing to prevent multiple simultaneous flashes
 
     void Awake()
     {
-        cubeRenderer = GetComponent<Renderer>(); //get Renderer that'a attached to main cube
-        
-        originalColor = cubeRenderer.material.color; //store original color, so we can revert back to it later
-        
+        mainCubeRenderer = GetComponent<Renderer>(); //get Renderer that'a attached to main cube
+        mainCubeOriginalColor = mainCubeRenderer.material.color; //store original color, so we can revert back to it later
+   
         subCubeOriginalColors = new Color[subCubeFlashes.Length];
     }
 
@@ -36,14 +37,21 @@ public class MainCubeFlash : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1))
         {
-            startToRotate = !startToRotate;
-            if (startToRotate && !isFlashing)
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit))
             {
-                StartCoroutine(FlashSubCubeColor());
-                Debug.Log("Flashing SubCube");
+                if (hit.collider != null && hit.collider.gameObject == this.gameObject)
+                {
+                    startToRotate = !startToRotate;
+                    if (startToRotate && !IsFlashing)
+                    {
+                        StartCoroutine(FlashSubCubeColor());
+                        Debug.Log("Flashing SubCube");
+                    }
+                }
             }
         }
-
 
         if (startToRotate)
         {
@@ -51,38 +59,38 @@ public class MainCubeFlash : MonoBehaviour
         }
     }
 
+    // Detect mouse click on the cube
     private void OnMouseDown()
     {
         if (Input.GetMouseButtonDown(0)) {
-            StartCoroutine(FlashColor());
+            StartCoroutine(FlashMainCubeColor());
             Debug.Log("Flashing");
         }
     }
 
     //set the color of the main cube
     public void SetColor(Color color) { 
-        cubeRenderer.material.color = color;
+        mainCubeRenderer.material.color = color;
     }
 
     //get the color of the main cube
     public Color GetColor() { 
-        return cubeRenderer.material.color;
+        return mainCubeRenderer.material.color;
     }
 
     private void RotateCube()
     {
         transform.Rotate(new Vector3(0f,0f,rotateSpeed) * Time.deltaTime);
-        Debug.Log("Rotating" + startToRotate);
     }
 
     private System.Collections.IEnumerator FlashSubCubeColor()
     {
-        isFlashing = true;
-        for (int i = 0; i < 10; i++)
+        IsFlashing = true;
+        for (int i = 0; i < flashingTime; i++)
         {
             for (int j = 0; j < subCubeFlashes.Length; j++)
             {
-                subCubeFlashes[j].SetColor(originalColor);
+                subCubeFlashes[j].SetColor(mainCubeOriginalColor);
             }
             yield return new WaitForSeconds(flashDuration);
 
@@ -92,20 +100,41 @@ public class MainCubeFlash : MonoBehaviour
             }
             yield return new WaitForSeconds(flashDuration);
         }
-        isFlashing = false;
+        IsFlashing = false;
     }
 
-
-
-    private System.Collections.IEnumerator FlashColor()
+    private System.Collections.IEnumerator FlashMainCubeColor()
     {
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < flashingTime; i++)
         {
             SetColor(Color.red);//change color to red
             yield return new WaitForSeconds(flashDuration); //wait for specified duration
 
-            cubeRenderer.material.color = originalColor; //revert back to original color
+            mainCubeRenderer.material.color = mainCubeOriginalColor; //revert back to original color
             yield return new WaitForSeconds(flashDuration);
         }
+    }
+
+    public void FlashMainCubeToColor(Color targetColor, float dutation) 
+    { 
+        if (!IsFlashing) 
+        { 
+            StartCoroutine(FlashMainCubeToColorCoroutine(targetColor, dutation));
+        }
+    }
+
+    private System.Collections.IEnumerator FlashMainCubeToColorCoroutine(Color targetColor, float duration)
+    {
+        IsFlashing = true;
+
+        for (int i = 0; i < flashingTime; i++)
+        {
+            mainCubeRenderer.material.color = targetColor;
+            yield return new WaitForSeconds(duration);
+            mainCubeRenderer.material.color = mainCubeOriginalColor;
+            yield return new WaitForSeconds(duration);
+        }
+        
+        IsFlashing = false;
     }
 }

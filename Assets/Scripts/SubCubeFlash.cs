@@ -9,15 +9,11 @@ public class SubCubeFlash : MonoBehaviour
     private Color subCubeOriginalColor;
     private Renderer subCubeRenderer;
 
-    private Renderer cubeRenderer;
-
     private void Awake()
     {
         subCubeRenderer = GetComponent<Renderer>();
-        //cubeRenderer = GetComponent<Renderer>(); //get Renderer that'a attached to main cube
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         subCubeOriginalColor = subCubeRenderer.material.color;
@@ -26,10 +22,10 @@ public class SubCubeFlash : MonoBehaviour
 
     private void OnMouseDown()
     {
-        //for left mouse button 
-        if (Input.GetMouseButtonDown(0))
+        // Detect left mouse button click, and ensure mainCubeFlash is not null and not already flashing
+        if (Input.GetMouseButtonDown(0) && mainCubeFlash != null && !mainCubeFlash.IsFlashing)
         {
-            StartCoroutine(FlashMainCubeColor());
+            mainCubeFlash.FlashMainCubeToColor(subCubeOriginalColor, flashDuration);
         }
     }
 
@@ -45,21 +41,21 @@ public class SubCubeFlash : MonoBehaviour
         return subCubeRenderer.material.color;
     }
 
-    private System.Collections.IEnumerator FlashMainCubeColor()
-    {
-        if (mainCubeFlash != null)
-        {
-            for (int i = 0; i < 10; i++) {
-                mainCubeFlash.SetColor(subCubeOriginalColor); // flash the main cube to the sub-cube's original color
-                yield return new WaitForSeconds(flashDuration);
+    //private System.Collections.IEnumerator FlashMainCubeColor()
+    //{
+    //    if (mainCubeFlash != null)
+    //    {
+    //        for (int i = 0; i < 10; i++) {
+    //            mainCubeFlash.SetColor(subCubeOriginalColor); // flash the main cube to the sub-cube's original color
+    //            yield return new WaitForSeconds(flashDuration);
 
-                mainCubeFlash.SetColor(mainCubeOriginalColor); // revert back to original color
-                yield return new WaitForSeconds(flashDuration);
-            }
-        }
-        else
-        {
-            Debug.LogWarning("MainCubeFlash reference is not set.");
-        }
-    }
+    //            mainCubeFlash.SetColor(mainCubeOriginalColor); // revert back to original color
+    //            yield return new WaitForSeconds(flashDuration);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        Debug.LogWarning("MainCubeFlash reference is not set.");
+    //    }
+    //}
 }

@@ -33,6 +33,7 @@ public class CubeSnapper : EditorWindow
         }
     }
 
+    // Snap the main cube to origin and sub-cubes in a row next to it
     private void SnapCubes()
     {
         GameObject mainCube = GameObject.FindGameObjectWithTag("MainCube");
@@ -62,6 +63,7 @@ public class CubeSnapper : EditorWindow
         }
     }
 
+    // UnSnap cubes to their original positions
     private void UnSnapCubes()
     {
         GameObject mainCube = GameObject.FindGameObjectWithTag("MainCube");
@@ -86,6 +88,7 @@ public class CubeSnapper : EditorWindow
         subCubeOriginalPositions = null;
     }
 
+    // Set all sub-cubes to the color of the main cube
     private void SetToMainCubeColor()
     {
         GameObject mainCube = GameObject.FindGameObjectWithTag("MainCube");
@@ -113,6 +116,7 @@ public class CubeSnapper : EditorWindow
         }
     }
 
+    // Revert sub-cubes to their original colors
     private void UnSetMainCubeColor()
     { 
         GameObject[] subCubes = GameObject.FindGameObjectsWithTag("SubCube");
@@ -160,6 +164,7 @@ public class CubeSnapper : EditorWindow
         }
     }
 
+    // This function will enable mouse click on the cubes when unsnapped
     private void EnableMouseClick()
     {
         GameObject mainCube = GameObject.FindGameObjectWithTag("MainCube");
