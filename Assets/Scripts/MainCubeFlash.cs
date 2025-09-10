@@ -22,11 +22,14 @@ public class MainCubeFlash : MonoBehaviour
         originalColor = cubeRenderer.material.color; //store original color, so we can revert back to it later
         
         subCubeOriginalColors = new Color[subCubeFlashes.Length];
+    }
+
+    void Start()
+    {
         for (int i = 0; i < subCubeFlashes.Length; i++)
         {
             subCubeOriginalColors[i] = subCubeFlashes[i].GetColor();
         } //store the original color of the sub-cube
-
     }
 
     private void Update()

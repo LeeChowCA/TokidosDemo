@@ -22,12 +22,14 @@ public class CubeSnapper : EditorWindow
         {
             SnapCubes();
             SetToMainCubeColor();
+            DisableMouseClick();
         }
 
         if (GUILayout.Button("UnSnap Cubes"))
         {
             UnSnapCubes();
             UnSetMainCubeColor();
+            EnableMouseClick();
         }
     }
 
@@ -139,10 +141,40 @@ public class CubeSnapper : EditorWindow
             Debug.LogWarning("MainCube or SubCubes not found in the scene.");
             return;
         }
-        mainCube.GetComponent<Collider>().enabled = false;
+
+        if (!mainCube.GetComponent<MainCubeFlash>())
+        {
+            Debug.LogWarning("MainCubeFlash component not found on MainCube.");
+        }
+        else
+        {
+            Debug.Log("Disabling MainCubeFlash component.");
+            mainCube.GetComponent<MainCubeFlash>().enabled = false;
+            mainCube.GetComponent<Collider>().enabled = false;
+        }
+
+            foreach (GameObject subCube in subCubes)
+            {
+                subCube.GetComponent<SubCubeFlash>().enabled = false;
+                subCube.GetComponent<Collider>().enabled = false;
+        }
+    }
+
+    private void EnableMouseClick()
+    {
+        GameObject mainCube = GameObject.FindGameObjectWithTag("MainCube");
+        GameObject[] subCubes = GameObject.FindGameObjectsWithTag("SubCube");
+        if (mainCube == null || subCubes.Length == 0)
+        {
+            Debug.LogWarning("MainCube or SubCubes not found in the scene.");
+            return;
+        }
+        mainCube.GetComponent<MainCubeFlash>().enabled = true;
+        mainCube.GetComponent<Collider>().enabled = true;
         foreach (GameObject subCube in subCubes)
         {
-            subCube.GetComponent<Collider>().enabled = false;
+            subCube.GetComponent<SubCubeFlash>().enabled = true;
+            subCube.GetComponent<Collider>().enabled = true;
         }
     }
 }

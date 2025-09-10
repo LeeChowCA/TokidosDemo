@@ -14,7 +14,6 @@ public class SubCubeFlash : MonoBehaviour
     private void Awake()
     {
         subCubeRenderer = GetComponent<Renderer>();
-        Debug.Assert(subCubeRenderer != null, "Renderer component not found on SubCubeFlash GameObject.");
         //cubeRenderer = GetComponent<Renderer>(); //get Renderer that'a attached to main cube
     }
 
